@@ -2,7 +2,7 @@ from pprint import pprint
 
 import aiohttp
 
-from isppyapi.billmanager import _handle_billmgr_response
+from isppyapi.helpers import _handle_billmgr_response
 
 
 class DnsManagerClient:
