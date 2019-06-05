@@ -6,7 +6,6 @@ from isppyapi.billmanager import _handle_billmgr_response
 
 
 class DnsManagerClient:
-
     BASE_URL = 'https://82.146.47.1/manager/dnsmgr'
 
     def __init__(self, session=None):
