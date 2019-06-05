@@ -4,7 +4,9 @@ import aiohttp
 import configparser
 
 from pprint import pprint
-from isppyapi import billmanager
+
+import isppyapi
+
 
 async def main():
     parser = argparse.ArgumentParser()
@@ -19,7 +21,7 @@ async def main():
 
     async with session:
         """
-        manager = BillManagerClient(session)
+        manager = isppyapi.BillManagerClient(session)
         await manager.login(args.user, args.password)
         result = await manager.list_vds()
         for doc in result['doc']['elem']:
@@ -28,7 +30,7 @@ async def main():
             print(doc)
         """
 
-        manager = billmanager.DnsManagerClient(session)
+        manager = isppyapi.DnsManagerClient(session)
         await manager.login(config['dnsmanager']['user'],
                             config['dnsmanager']['password'])
 
