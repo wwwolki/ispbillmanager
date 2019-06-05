@@ -1,16 +1,18 @@
+from typing import Optional
+
 from pprint import pprint
 
 import aiohttp
 
 from isppyapi.helpers import _handle_billmgr_response
+from isppyapi.manager import ManagerClient
 
 
-class DnsManagerClient:
-    BASE_URL = 'https://82.146.47.1/manager/dnsmgr'
-
-    def __init__(self, session=None):
-        self._session = session or aiohttp.ClientSession()
-        self._session_id = None
+class DnsManagerClient(ManagerClient):
+    def __init__(self,
+                 session: Optional[aiohttp.ClientSession] = None,
+                 base_url: str = ''):
+        super(DnsManagerClient, self).__init__(session, base_url)
 
     async def login(self, username: str, password: str)->None:
         params = {
@@ -19,7 +21,7 @@ class DnsManagerClient:
             'username': username,
             'password': password
         }
-        async with self._session.get(self.BASE_URL, params=params) as response:
+        async with self._session.get(self.base_url, params=params) as response:
             result = await _handle_billmgr_response(response)
             self._session_id = result['doc']['auth']['$id']
 
@@ -29,7 +31,7 @@ class DnsManagerClient:
             'func': 'domain',
             'auth': self._session_id
         }
-        async with self._session.get(self.BASE_URL, params=params) as response:
+        async with self._session.get(self.base_url, params=params) as response:
             result = await _handle_billmgr_response(response)
             return result
 
@@ -39,7 +41,7 @@ class DnsManagerClient:
             'func': 'domain.su',
             'auth': self._session_id,
         }
-        async with self._session.get(self.BASE_URL, params=params) as response:
+        async with self._session.get(self.base_url, params=params) as response:
             result = await _handle_billmgr_response(response)
             return result
 
@@ -51,7 +53,7 @@ class DnsManagerClient:
             'elname': name,
             'elid': name,
         }
-        async with self._session.get(self.BASE_URL, params=params) as response:
+        async with self._session.get(self.base_url, params=params) as response:
             result = await _handle_billmgr_response(response)
             return result
 
@@ -67,6 +69,6 @@ class DnsManagerClient:
             'ip': ip
         }
         pprint(params)
-        async with self._session.get(self.BASE_URL, params=params) as response:
+        async with self._session.get(self.base_url, params=params) as response:
             result = await _handle_billmgr_response(response)
             return result

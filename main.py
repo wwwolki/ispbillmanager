@@ -30,7 +30,7 @@ async def main():
             print(doc)
         """
 
-        manager = isppyapi.DnsManagerClient(session)
+        manager = isppyapi.DnsManagerClient(session, base_url=config['dnsmanager']['base_url'])
         await manager.login(config['dnsmanager']['user'],
                             config['dnsmanager']['password'])
 
