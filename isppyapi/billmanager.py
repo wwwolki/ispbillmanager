@@ -14,7 +14,7 @@ class BillManagerClient:
 
     BASE_URL = 'https://my.firstvds.ru/billmgr'
 
-    def __init__(self, session=None):
+    def __init__(self, session=None, base_url=''):
         self._session = session or aiohttp.ClientSession()
         self._session_id = None
 

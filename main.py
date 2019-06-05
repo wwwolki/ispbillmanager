@@ -28,9 +28,10 @@ async def main():
     config.read(args.config)
 
     async with session:
-        manager = MANAGERS[args.manager](session)
         username = args.user or config[args.manager]['user']
         password = args.password or config[args.manager]['password']
+        base_url = config[args.manager]['base_url']
+        manager = MANAGERS[args.manager](session, base_url=base_url)
         await manager.login(username=username, password=password)
 
         """
