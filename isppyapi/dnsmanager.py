@@ -12,7 +12,7 @@ class DnsManagerClient(ManagerClient):
     def __init__(self,
                  session: Optional[aiohttp.ClientSession] = None,
                  base_url: str = ''):
-        super(DnsManagerClient, self).__init__(session, base_url)
+        super().__init__(session, base_url)
 
     async def login(self, username: str, password: str)->None:
         params = {
