@@ -1,9 +1,7 @@
 from typing import Optional
 
 from pprint import pprint
-
 import aiohttp
-
 from isppyapi.manager import ManagerClient
 
 
