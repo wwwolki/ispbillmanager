@@ -4,7 +4,6 @@ from pprint import pprint
 
 import aiohttp
 
-from isppyapi.helpers import _handle_billmgr_response
 from isppyapi.manager import ManagerClient
 
 
@@ -22,7 +21,7 @@ class DnsManagerClient(ManagerClient):
             'password': password
         }
         async with self._session.get(self.base_url, params=params) as response:
-            result = await _handle_billmgr_response(response)
+            result = await self._handle_response(response)
             self._session_id = result['doc']['auth']['$id']
 
     async def list_domains(self)->dict:
@@ -32,7 +31,7 @@ class DnsManagerClient(ManagerClient):
             'auth': self._session_id
         }
         async with self._session.get(self.base_url, params=params) as response:
-            result = await _handle_billmgr_response(response)
+            result = await self._handle_response(response)
             return result
 
     async def domain_su(self )->dict:
@@ -42,7 +41,7 @@ class DnsManagerClient(ManagerClient):
             'auth': self._session_id,
         }
         async with self._session.get(self.base_url, params=params) as response:
-            result = await _handle_billmgr_response(response)
+            result = await self._handle_response(response)
             return result
 
     async def list_domain_records(self, name)->dict:
@@ -54,7 +53,7 @@ class DnsManagerClient(ManagerClient):
             'elid': name,
         }
         async with self._session.get(self.base_url, params=params) as response:
-            result = await _handle_billmgr_response(response)
+            result = await self._handle_response(response)
             return result
 
     async def add_domain_record(self, domain_name, name, ip)->dict:
@@ -70,5 +69,5 @@ class DnsManagerClient(ManagerClient):
         }
         pprint(params)
         async with self._session.get(self.base_url, params=params) as response:
-            result = await _handle_billmgr_response(response)
+            result = await self._handle_response(response)
             return result
