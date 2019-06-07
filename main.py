@@ -38,7 +38,7 @@ async def main():
         manager = isppyapi.BillManagerClient(session)
         await manager.login(args.user, args.password)
         result = await manager.list_vds()
-        for doc in result['doc']['elem']:
+        for doc in result['elem']:
             vds = isppyapi.VDS(**{key: doc[key]['$'] for key in VDS._field_types.keys()})
             #print(vds)
             print(doc)
