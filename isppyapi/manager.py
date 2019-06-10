@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Any
 
 import aiohttp
 
@@ -21,6 +21,14 @@ class ApiError(BaseError):
     """ This is the only exception which should be handled and subclassed """
     def __init__(self, error_description):
         super().__init__('api returned error:{}'.format(error_description))
+
+
+def extract_list(doc, elemType) -> List[Any]:
+    result = []
+    for doc in doc['elem']:
+        vds = elemType(**{key: doc[key]['$'] for key in elemType._field_types.keys()})
+        result.append(vds)
+    return result
 
 
 class ManagerClient:
@@ -54,3 +62,15 @@ class ManagerClient:
             error = data["doc"]["error"]["msg"]["$"]
             raise ApiError(error)
         return data['doc']
+
+    async def login(self, username: str, password: str)->None:
+        params = {
+            'out': 'json',
+            'func': 'auth',
+            'username': username,
+            'password': password
+        }
+        async with self._session.get(self.base_url, params=params) as response:
+            result = await self._handle_response(response)
+            print(result)
+            self._session_id = result['auth']['$id']

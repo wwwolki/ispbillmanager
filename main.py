@@ -19,6 +19,7 @@ async def main():
     parser.add_argument('--password')
     parser.add_argument('manager')
     parser.add_argument('command')
+    parser.add_argument('args', nargs='*')
     parser.add_argument('-c', '--config', default='config.ini', help="config filename")
     args = parser.parse_args()
 
@@ -34,15 +35,29 @@ async def main():
         manager = MANAGERS[args.manager](session, base_url=base_url)
         await manager.login(username=username, password=password)
 
-        """
-        manager = isppyapi.BillManagerClient(session)
-        await manager.login(args.user, args.password)
-        result = await manager.list_vds()
-        for doc in result['elem']:
-            vds = isppyapi.VDS(**{key: doc[key]['$'] for key in VDS._field_types.keys()})
-            #print(vds)
-            print(doc)
+        if args.command == 'list':
+            result = await manager.list_vds()
+            for vds in result:
+                print(vds)
+        if args.command == 'list_domains':
+            result = await manager.list_domains()
+            pprint(result)
+        if args.command == 'domain_su':
+            result = await manager.domain_su()
+            pprint(result)
 
+        if args.command == 'list_records':
+            result = await manager.list_domain_records(*args.args)
+            pprint(result)
+
+        if args.command == 'add_record':
+            result = await manager.add_domain_record(*args.args)
+            pprint(result)
+
+        if args.command == 'remove_record':
+            result = await manager.remove_record(*args.args)
+            pprint(result)
+        """
         manager = isppyapi.DnsManagerClient(session, base_url=config['dnsmanager']['base_url'])
         await manager.login(config['dnsmanager']['user'],
                             config['dnsmanager']['password'])

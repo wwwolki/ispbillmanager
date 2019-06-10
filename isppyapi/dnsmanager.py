@@ -1,8 +1,31 @@
-from typing import Optional
+from typing import Optional, NamedTuple, List
 
 from pprint import pprint
 import aiohttp
+from isppyapi.manager import extract_list
 from isppyapi.manager import ManagerClient
+
+
+Domain = NamedTuple('VDS', fields=[
+    ('active', str),
+    ('curruser', str),
+    ('dnssecstatus', str),
+    ('dtype', str),
+    ('name', str),
+    ('published', str),
+    ('user', str)
+])
+
+
+DomainRecord = NamedTuple('DomainRecord', fields=[
+    ('name', str),
+    ('rkey', str),
+    ('rkey_name', str),
+    ('rtype', str),
+    ('rtype_hidden', str),
+    ('ttl', str),
+    ('value', str)
+])
 
 
 class DnsManagerClient(ManagerClient):
@@ -11,28 +34,17 @@ class DnsManagerClient(ManagerClient):
                  base_url: str = ''):
         super().__init__(session, base_url)
 
-    async def login(self, username: str, password: str)->None:
-        params = {
-            'out': 'json',
-            'func': 'auth',
-            'username': username,
-            'password': password
-        }
-        async with self._session.get(self.base_url, params=params) as response:
-            result = await self._handle_response(response)
-            self._session_id = result['doc']['auth']['$id']
-
-    async def list_domains(self)->dict:
+    async def list_domains(self) -> List[Domain]:
         params = {
             'out': 'json',
             'func': 'domain',
             'auth': self._session_id
         }
         async with self._session.get(self.base_url, params=params) as response:
-            result = await self._handle_response(response)
-            return result
+            response = await self._handle_response(response)
+            return extract_list(response, Domain)
 
-    async def domain_su(self )->dict:
+    async def domain_su(self)->dict:
         params = {
             'out': 'json',
             'func': 'domain.su',
@@ -42,7 +54,7 @@ class DnsManagerClient(ManagerClient):
             result = await self._handle_response(response)
             return result
 
-    async def list_domain_records(self, name)->dict:
+    async def list_domain_records(self, name)->List[DomainRecord]:
         params = {
             'out': 'json',
             'func': 'domain.record',
@@ -52,10 +64,9 @@ class DnsManagerClient(ManagerClient):
         }
         async with self._session.get(self.base_url, params=params) as response:
             result = await self._handle_response(response)
-            return result
+            return extract_list(result, DomainRecord)
 
     async def add_domain_record(self, domain_name, name, ip)->dict:
-        full_name = '{}.{}. A  {}'.format(name, domain_name, ip)
         params = {
             'out': 'json',
             'func': 'domain.record.edit',
@@ -64,6 +75,20 @@ class DnsManagerClient(ManagerClient):
             'sok': 'ok',
             'name': name,
             'ip': ip
+        }
+        pprint(params)
+        async with self._session.get(self.base_url, params=params) as response:
+            result = await self._handle_response(response)
+            return result
+
+    async def remove_record(self, domain, rkeys)->dict:
+        params = {
+            'out': 'json',
+            'func': 'domain.record.delete',
+            'auth': self._session_id,
+            'elid': rkeys,
+            'plid': domain,
+            'sok': 'ok',
         }
         pprint(params)
         async with self._session.get(self.base_url, params=params) as response:
